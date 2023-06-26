@@ -1,28 +1,28 @@
-local Player = game:GetService("Players").LocalPlayer
+local Players = game:GetService("Players")
 local UserInputService = game:GetService("UserInputService")
+
+local localPlayer = Players.LocalPlayer
+local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
+local humanoid = character:WaitForChild("Humanoid")
 
 local infiniteJumpEnabled = false
 
--- Function to toggle infinite jump
 local function toggleInfiniteJump()
     infiniteJumpEnabled = not infiniteJumpEnabled
     print("Infinite Jump:", infiniteJumpEnabled)
 end
 
--- Function to handle user input
-local function onKeyPress(input)
-    if input.KeyCode == Enum.KeyCode.Zero then
+local function onKeyPress(input, gameProcessedEvent)
+    if input.KeyCode == Enum.KeyCode.Zero and not gameProcessedEvent then
         toggleInfiniteJump()
     end
 end
 
--- Connect the function to the key press event
 UserInputService.InputBegan:Connect(onKeyPress)
 
--- Loop to enable infinite jump
 game:GetService("RunService").Heartbeat:Connect(function()
     if infiniteJumpEnabled then
-        Player.Character.Humanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+        humanoid.Jump = true
     end
 end)
 
