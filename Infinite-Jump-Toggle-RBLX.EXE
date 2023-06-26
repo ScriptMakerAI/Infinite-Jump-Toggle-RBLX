@@ -1,29 +1,25 @@
-local Players = game:GetService("Players")
-local UserInputService = game:GetService("UserInputService")
+local char = script.Parent
+local hum = char:WaitForChild("Humanoid")
 
-local localPlayer = Players.LocalPlayer
-local character = localPlayer.Character or localPlayer.CharacterAdded:Wait()
-local humanoid = character:WaitForChild("Humanoid")
+local uis = game:GetService("UserInputService")
 
-local infiniteJumpEnabled = false
+local jumps = 0
+local maxJumps = 50
 
-local function toggleInfiniteJump()
-    infiniteJumpEnabled = not infiniteJumpEnabled
-    print("Infinite Jump:", infiniteJumpEnabled)
-end
+local currentTick = tick()
 
-local function onKeyPress(input, gameProcessedEvent)
-    if input.KeyCode == Enum.KeyCode.Zero and not gameProcessedEvent then
-        toggleInfiniteJump()
-    end
-end
+hum.StateChanged:Connect(function(oldState, newState)
+	if newState == Enum.HumanoidStateType.Landed then
+		jumps = 0
+	end
+end)
 
-UserInputService.InputBegan:Connect(onKeyPress)
-
-game:GetService("RunService").Heartbeat:Connect(function()
-    if infiniteJumpEnabled then
-        humanoid.Jump = true
-    end
+uis.JumpRequest:Connect(function()
+	if jumps < maxJumps and tick() - currentTick > 0.2 then
+		jumps += 1
+		currentTick = tick()
+		hum:ChangeState(Enum.HumanoidStateType.Jumping)
+	end
 end)
 
 print("Toggled Infinite Jump.")
